@@ -1,0 +1,48 @@
+# Unreal generated files
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+.vs/
+.idea/
+
+# IDE/project generated files
+*.sln
+*.suo
+*.user
+*.userosscache
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.opendb
+.vsconfig
+
+# Keep this repository code/config focused.
+# Add Content files manually later only if you really want them in Git.
+Content/
+*.uasset
+*.umap
+*.ubulk
+*.uexp
+
+# Raw art/audio/source assets
+*.png
+*.jpg
+*.jpeg
+*.tga
+*.bmp
+*.exr
+*.hdr
+*.psd
+*.wav
+*.mp3
+*.ogg
+*.fbx
+*.blend
+*.glb
+*.gltf
+
+# Logs and temp files
+*.log
+*.tmp
+*.bak
