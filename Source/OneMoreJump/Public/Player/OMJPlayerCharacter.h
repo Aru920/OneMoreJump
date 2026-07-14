@@ -29,6 +29,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Win")
 	void Win();
 
+	UFUNCTION(BlueprintCallable, Category = "Run")
+	void StartRun();
+
 	UFUNCTION(BlueprintCallable, Category = "Checkpoint")
 	void SetCheckpointLocation(FVector NewCheckpointLocation);
 
@@ -43,6 +46,15 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Time")
 	float GetElapsedTime() const;
+
+	UFUNCTION(BlueprintPure, Category = "Time")
+	int32 GetElapsedMinutes() const;
+
+	UFUNCTION(BlueprintPure, Category = "Time")
+	int32 GetElapsedSeconds() const;
+
+	UFUNCTION(BlueprintPure, Category = "Checkpoint")
+	bool HasCheckpoint() const;
 
 	UPROPERTY(BlueprintAssignable, Category = "Coins")
 	FOMJCoinsChangedSignature OnCoinsChanged;
@@ -97,6 +109,7 @@ private:
 	bool bMoveRightHeld = false;
 	bool bIsDead = false;
 	bool bHasWon = false;
+	bool bWaitingForStart = true;
 	bool bRunFinished = false;
 	bool bHasCheckpoint = false;
 	int32 CoinsCollected = 0;

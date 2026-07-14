@@ -7,6 +7,7 @@
 #include "InputCoreTypes.h"
 #include "PaperFlipbook.h"
 #include "PaperFlipbookComponent.h"
+#include "Player/OMJPlayerController.h"
 
 AOMJPlayerCharacter::AOMJPlayerCharacter()
 {
@@ -34,6 +35,12 @@ void AOMJPlayerCharacter::BeginPlay()
 
 	GetCharacterMovement()->JumpZVelocity = JumpHeight;
 	RunStartTime = GetWorld()->GetTimeSeconds();
+	GetCharacterMovement()->DisableMovement();
+
+	if (IdleFlipbook)
+	{
+		GetSprite()->SetFlipbook(IdleFlipbook);
+	}
 }
 
 void AOMJPlayerCharacter::Tick(float DeltaSeconds)
@@ -76,7 +83,11 @@ void AOMJPlayerCharacter::Die()
 	SetActorEnableCollision(false);
 	GetCharacterMovement()->DisableMovement();
 
-	FinishRun();
+	if (AOMJPlayerController* PlayerController = Cast<AOMJPlayerController>(GetController()))
+	{
+		PlayerController->HidePlayerHUD();
+	}
+
 	OnPlayerDied();
 }
 
@@ -100,7 +111,27 @@ void AOMJPlayerCharacter::Win()
 	}
 
 	FinishRun();
+
+	if (AOMJPlayerController* PlayerController = Cast<AOMJPlayerController>(GetController()))
+	{
+		PlayerController->HidePlayerHUD();
+	}
+
 	OnPlayerWon();
+}
+
+void AOMJPlayerCharacter::StartRun()
+{
+	if (bIsDead || bHasWon)
+	{
+		return;
+	}
+
+	bWaitingForStart = false;
+	bRunFinished = false;
+	RunStartTime = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f;
+	GetCharacterMovement()->StopMovementImmediately();
+	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 }
 
 void AOMJPlayerCharacter::SetCheckpointLocation(FVector NewCheckpointLocation)
@@ -125,7 +156,7 @@ void AOMJPlayerCharacter::RespawnAtCheckpoint()
 
 void AOMJPlayerCharacter::CollectCoin()
 {
-	if (bIsDead || bHasWon)
+	if (bWaitingForStart || bIsDead || bHasWon)
 	{
 		return;
 	}
@@ -141,7 +172,7 @@ int32 AOMJPlayerCharacter::GetCoinsCollected() const
 
 float AOMJPlayerCharacter::GetElapsedTime() const
 {
-	if (!GetWorld())
+	if (bWaitingForStart || !GetWorld())
 	{
 		return 0.f;
 	}
@@ -149,9 +180,24 @@ float AOMJPlayerCharacter::GetElapsedTime() const
 	return (bRunFinished ? RunEndTime : GetWorld()->GetTimeSeconds()) - RunStartTime;
 }
 
+int32 AOMJPlayerCharacter::GetElapsedMinutes() const
+{
+	return FMath::FloorToInt(GetElapsedTime()) / 60;
+}
+
+int32 AOMJPlayerCharacter::GetElapsedSeconds() const
+{
+	return FMath::FloorToInt(GetElapsedTime()) % 60;
+}
+
+bool AOMJPlayerCharacter::HasCheckpoint() const
+{
+	return bHasCheckpoint;
+}
+
 void AOMJPlayerCharacter::MoveLeftPressed()
 {
-	if (bIsDead || bHasWon)
+	if (bWaitingForStart || bIsDead || bHasWon)
 	{
 		return;
 	}
@@ -167,7 +213,7 @@ void AOMJPlayerCharacter::MoveLeftReleased()
 
 void AOMJPlayerCharacter::MoveRightPressed()
 {
-	if (bIsDead || bHasWon)
+	if (bWaitingForStart || bIsDead || bHasWon)
 	{
 		return;
 	}
@@ -183,7 +229,7 @@ void AOMJPlayerCharacter::MoveRightReleased()
 
 void AOMJPlayerCharacter::StartJump()
 {
-	if (bIsDead || bHasWon)
+	if (bWaitingForStart || bIsDead || bHasWon)
 	{
 		return;
 	}
@@ -198,7 +244,7 @@ void AOMJPlayerCharacter::StopJump()
 
 void AOMJPlayerCharacter::UpdateMovement()
 {
-	if (bIsDead || bHasWon)
+	if (bWaitingForStart || bIsDead || bHasWon)
 	{
 		return;
 	}
