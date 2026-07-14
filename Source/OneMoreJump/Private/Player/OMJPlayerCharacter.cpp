@@ -33,6 +33,7 @@ void AOMJPlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	GetCharacterMovement()->JumpZVelocity = JumpHeight;
+	RunStartTime = GetWorld()->GetTimeSeconds();
 }
 
 void AOMJPlayerCharacter::Tick(float DeltaSeconds)
@@ -75,6 +76,7 @@ void AOMJPlayerCharacter::Die()
 	SetActorEnableCollision(false);
 	GetCharacterMovement()->DisableMovement();
 
+	FinishRun();
 	OnPlayerDied();
 }
 
@@ -97,7 +99,34 @@ void AOMJPlayerCharacter::Win()
 		GetSprite()->SetFlipbook(IdleFlipbook);
 	}
 
+	FinishRun();
 	OnPlayerWon();
+}
+
+void AOMJPlayerCharacter::CollectCoin()
+{
+	if (bIsDead || bHasWon)
+	{
+		return;
+	}
+
+	++CoinsCollected;
+	OnCoinsChanged.Broadcast(CoinsCollected);
+}
+
+int32 AOMJPlayerCharacter::GetCoinsCollected() const
+{
+	return CoinsCollected;
+}
+
+float AOMJPlayerCharacter::GetElapsedTime() const
+{
+	if (!GetWorld())
+	{
+		return 0.f;
+	}
+
+	return (bRunFinished ? RunEndTime : GetWorld()->GetTimeSeconds()) - RunStartTime;
 }
 
 void AOMJPlayerCharacter::MoveLeftPressed()
@@ -191,4 +220,16 @@ void AOMJPlayerCharacter::SetFacingDirection(float Direction)
 	FVector CurrentSpriteScale = GetSprite()->GetRelativeScale3D();
 	CurrentSpriteScale.X = FMath::Abs(CurrentSpriteScale.X) * FMath::Sign(Direction);
 	GetSprite()->SetRelativeScale3D(CurrentSpriteScale);
+}
+
+void AOMJPlayerCharacter::FinishRun()
+{
+	if (bRunFinished)
+	{
+		return;
+	}
+
+	bRunFinished = true;
+	RunEndTime = GetWorld() ? GetWorld()->GetTimeSeconds() : RunStartTime;
+	OnRunFinished.Broadcast(GetElapsedTime(), CoinsCollected);
 }

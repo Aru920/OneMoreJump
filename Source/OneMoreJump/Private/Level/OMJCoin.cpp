@@ -1,7 +1,6 @@
 #include "Level/OMJCoin.h"
 
 #include "Components/SphereComponent.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "PaperFlipbookComponent.h"
 #include "Player/OMJPlayerCharacter.h"
 
@@ -36,9 +35,9 @@ void AOMJCoin::HandleCoinOverlap(
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	if (IsValid(OtherActor) && OtherActor->IsA<AOMJPlayerCharacter>())
+	if (AOMJPlayerCharacter* PlayerCharacter = Cast<AOMJPlayerCharacter>(OtherActor))
 	{
-		UKismetSystemLibrary::PrintString(this, TEXT("Coin collected"), true, true, FLinearColor::Yellow, 1.5f);
+		PlayerCharacter->CollectCoin();
 		Destroy();
 	}
 }

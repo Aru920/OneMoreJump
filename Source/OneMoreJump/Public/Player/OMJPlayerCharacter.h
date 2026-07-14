@@ -8,6 +8,9 @@ class UCameraComponent;
 class UPaperFlipbook;
 class USpringArmComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOMJCoinsChangedSignature, int32, CoinsCollected);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOMJRunFinishedSignature, float, TimeTaken, int32, CoinsCollected);
+
 UCLASS(Blueprintable)
 class ONEMOREJUMP_API AOMJPlayerCharacter : public APaperCharacter
 {
@@ -25,6 +28,21 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Win")
 	void Win();
+
+	UFUNCTION(BlueprintCallable, Category = "Coins")
+	void CollectCoin();
+
+	UFUNCTION(BlueprintPure, Category = "Coins")
+	int32 GetCoinsCollected() const;
+
+	UFUNCTION(BlueprintPure, Category = "Time")
+	float GetElapsedTime() const;
+
+	UPROPERTY(BlueprintAssignable, Category = "Coins")
+	FOMJCoinsChangedSignature OnCoinsChanged;
+
+	UPROPERTY(BlueprintAssignable, Category = "Run")
+	FOMJRunFinishedSignature OnRunFinished;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<USpringArmComponent> CameraBoom;
@@ -67,9 +85,14 @@ private:
 	void UpdateMovement();
 	void UpdateFlipbook();
 	void SetFacingDirection(float Direction);
+	void FinishRun();
 
 	bool bMoveLeftHeld = false;
 	bool bMoveRightHeld = false;
 	bool bIsDead = false;
 	bool bHasWon = false;
+	bool bRunFinished = false;
+	int32 CoinsCollected = 0;
+	float RunStartTime = 0.f;
+	float RunEndTime = 0.f;
 };
