@@ -1,7 +1,6 @@
 #include "Level/OMJCheckpoint.h"
 
 #include "Components/SphereComponent.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "PaperFlipbookComponent.h"
 #include "Player/OMJPlayerCharacter.h"
 
@@ -36,9 +35,15 @@ void AOMJCheckpoint::HandleCheckpointOverlap(
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
+	if (bReached)
+	{
+		return;
+	}
+
 	if (AOMJPlayerCharacter* PlayerCharacter = Cast<AOMJPlayerCharacter>(OtherActor))
 	{
+		bReached = true;
 		PlayerCharacter->SetCheckpointLocation(GetActorLocation());
-		UKismetSystemLibrary::PrintString(this, TEXT("Checkpoint reached"), true, true, FLinearColor::Green, 1.5f);
+		OnCheckpointReached();
 	}
 }

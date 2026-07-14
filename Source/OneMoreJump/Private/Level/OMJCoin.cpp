@@ -1,6 +1,7 @@
 #include "Level/OMJCoin.h"
 
 #include "Components/SphereComponent.h"
+#include "TimerManager.h"
 #include "PaperFlipbookComponent.h"
 #include "Player/OMJPlayerCharacter.h"
 
@@ -35,9 +36,17 @@ void AOMJCoin::HandleCoinOverlap(
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
+	if (bCollected)
+	{
+		return;
+	}
+
 	if (AOMJPlayerCharacter* PlayerCharacter = Cast<AOMJPlayerCharacter>(OtherActor))
 	{
+		bCollected = true;
+		Collision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		PlayerCharacter->CollectCoin();
-		Destroy();
+		OnCoinCollected();
+		SetLifeSpan(DestroyDelay);
 	}
 }
