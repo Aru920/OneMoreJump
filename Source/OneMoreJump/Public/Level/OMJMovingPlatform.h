@@ -13,6 +13,13 @@ enum class EOMJPlatformMoveDirection : uint8
 	TopBottom
 };
 
+UENUM(BlueprintType)
+enum class EOMJPlatformStartDirection : uint8
+{
+	Positive,
+	Negative
+};
+
 UCLASS()
 class ONEMOREJUMP_API AOMJMovingPlatform : public AActor
 {
@@ -23,6 +30,9 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	UFUNCTION(BlueprintCallable, Category = "Movement")
+	void SetMoveSpeed(float NewMoveSpeed);
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -31,6 +41,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	EOMJPlatformMoveDirection MoveDirection = EOMJPlatformMoveDirection::LeftRight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	EOMJPlatformStartDirection StartDirection = EOMJPlatformStartDirection::Positive;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (ClampMin = "0.0"))
 	float MoveDistance = 300.f;

@@ -15,6 +15,12 @@ void AOMJMovingPlatform::BeginPlay()
 	Super::BeginPlay();
 
 	StartLocation = GetActorLocation();
+	MoveSign = StartDirection == EOMJPlatformStartDirection::Positive ? 1.f : -1.f;
+}
+
+void AOMJMovingPlatform::SetMoveSpeed(float NewMoveSpeed)
+{
+	MoveSpeed = FMath::Max(0.f, NewMoveSpeed);
 }
 
 void AOMJMovingPlatform::Tick(float DeltaSeconds)
@@ -28,14 +34,17 @@ void AOMJMovingPlatform::Tick(float DeltaSeconds)
 
 	MoveOffset += MoveSpeed * MoveSign * DeltaSeconds;
 
-	if (MoveOffset >= MoveDistance)
+	const float MinOffset = StartDirection == EOMJPlatformStartDirection::Negative ? -MoveDistance : 0.f;
+	const float MaxOffset = StartDirection == EOMJPlatformStartDirection::Negative ? 0.f : MoveDistance;
+
+	if (MoveOffset >= MaxOffset)
 	{
-		MoveOffset = MoveDistance;
+		MoveOffset = MaxOffset;
 		MoveSign = -1.f;
 	}
-	else if (MoveOffset <= 0.f)
+	else if (MoveOffset <= MinOffset)
 	{
-		MoveOffset = 0.f;
+		MoveOffset = MinOffset;
 		MoveSign = 1.f;
 	}
 
