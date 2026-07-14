@@ -57,7 +57,7 @@ void AOMJPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 void AOMJPlayerCharacter::Die()
 {
-	if (bIsDead)
+	if (bIsDead || bHasWon)
 	{
 		return;
 	}
@@ -78,9 +78,31 @@ void AOMJPlayerCharacter::Die()
 	OnPlayerDied();
 }
 
+void AOMJPlayerCharacter::Win()
+{
+	if (bIsDead || bHasWon)
+	{
+		return;
+	}
+
+	bHasWon = true;
+	bMoveLeftHeld = false;
+	bMoveRightHeld = false;
+
+	GetCharacterMovement()->StopMovementImmediately();
+	GetCharacterMovement()->DisableMovement();
+
+	if (IdleFlipbook)
+	{
+		GetSprite()->SetFlipbook(IdleFlipbook);
+	}
+
+	OnPlayerWon();
+}
+
 void AOMJPlayerCharacter::MoveLeftPressed()
 {
-	if (bIsDead)
+	if (bIsDead || bHasWon)
 	{
 		return;
 	}
@@ -96,7 +118,7 @@ void AOMJPlayerCharacter::MoveLeftReleased()
 
 void AOMJPlayerCharacter::MoveRightPressed()
 {
-	if (bIsDead)
+	if (bIsDead || bHasWon)
 	{
 		return;
 	}
@@ -112,7 +134,7 @@ void AOMJPlayerCharacter::MoveRightReleased()
 
 void AOMJPlayerCharacter::StartJump()
 {
-	if (bIsDead)
+	if (bIsDead || bHasWon)
 	{
 		return;
 	}
@@ -127,7 +149,7 @@ void AOMJPlayerCharacter::StopJump()
 
 void AOMJPlayerCharacter::UpdateMovement()
 {
-	if (bIsDead)
+	if (bIsDead || bHasWon)
 	{
 		return;
 	}

@@ -23,6 +23,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Death")
 	void Die();
 
+	UFUNCTION(BlueprintCallable, Category = "Win")
+	void Win();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<USpringArmComponent> CameraBoom;
 
@@ -51,6 +54,9 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Death")
 	void OnPlayerDied();
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "Win")
+	void OnPlayerWon();
+
 private:
 	void MoveLeftPressed();
 	void MoveLeftReleased();
@@ -65,4 +71,5 @@ private:
 	bool bMoveLeftHeld = false;
 	bool bMoveRightHeld = false;
 	bool bIsDead = false;
+	bool bHasWon = false;
 };
