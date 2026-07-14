@@ -1,6 +1,5 @@
 #include "Level/OMJDeathVolume.h"
 
-#include "Kismet/KismetSystemLibrary.h"
 #include "PaperTileMapComponent.h"
 #include "Player/OMJPlayerCharacter.h"
 
@@ -17,6 +16,7 @@ void AOMJDeathVolume::BeginPlay()
 	Super::BeginPlay();
 
 	DeathTileMap->OnComponentBeginOverlap.AddDynamic(this, &AOMJDeathVolume::HandleDeathTileMapOverlap);
+	DeathTileMap->OnComponentHit.AddDynamic(this, &AOMJDeathVolume::HandleDeathTileMapHit);
 }
 
 void AOMJDeathVolume::HandleDeathTileMapOverlap(
@@ -27,8 +27,23 @@ void AOMJDeathVolume::HandleDeathTileMapOverlap(
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	if (IsValid(OtherActor) && OtherActor->IsA<AOMJPlayerCharacter>())
+	KillPlayerIfNeeded(OtherActor);
+}
+
+void AOMJDeathVolume::HandleDeathTileMapHit(
+	UPrimitiveComponent* HitComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	FVector NormalImpulse,
+	const FHitResult& Hit)
+{
+	KillPlayerIfNeeded(OtherActor);
+}
+
+void AOMJDeathVolume::KillPlayerIfNeeded(AActor* OtherActor)
+{
+	if (AOMJPlayerCharacter* PlayerCharacter = Cast<AOMJPlayerCharacter>(OtherActor))
 	{
-		UKismetSystemLibrary::PrintString(this, TEXT("Dead"), true, true, FLinearColor::Red, 2.f);
+		PlayerCharacter->Die();
 	}
 }

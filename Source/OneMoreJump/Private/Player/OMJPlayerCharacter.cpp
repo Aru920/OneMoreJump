@@ -55,8 +55,36 @@ void AOMJPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	PlayerInputComponent->BindKey(EKeys::SpaceBar, IE_Released, this, &AOMJPlayerCharacter::StopJump);
 }
 
+void AOMJPlayerCharacter::Die()
+{
+	if (bIsDead)
+	{
+		return;
+	}
+
+	bIsDead = true;
+	bMoveLeftHeld = false;
+	bMoveRightHeld = false;
+
+	if (DeathEffectClass)
+	{
+		GetWorld()->SpawnActor<AActor>(DeathEffectClass, GetActorTransform());
+	}
+
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
+	GetCharacterMovement()->DisableMovement();
+
+	OnPlayerDied();
+}
+
 void AOMJPlayerCharacter::MoveLeftPressed()
 {
+	if (bIsDead)
+	{
+		return;
+	}
+
 	bMoveLeftHeld = true;
 	SetFacingDirection(-1.f);
 }
@@ -68,6 +96,11 @@ void AOMJPlayerCharacter::MoveLeftReleased()
 
 void AOMJPlayerCharacter::MoveRightPressed()
 {
+	if (bIsDead)
+	{
+		return;
+	}
+
 	bMoveRightHeld = true;
 	SetFacingDirection(1.f);
 }
@@ -79,6 +112,11 @@ void AOMJPlayerCharacter::MoveRightReleased()
 
 void AOMJPlayerCharacter::StartJump()
 {
+	if (bIsDead)
+	{
+		return;
+	}
+
 	Jump();
 }
 
@@ -89,6 +127,11 @@ void AOMJPlayerCharacter::StopJump()
 
 void AOMJPlayerCharacter::UpdateMovement()
 {
+	if (bIsDead)
+	{
+		return;
+	}
+
 	const float MoveValue = (bMoveRightHeld ? 1.f : 0.f) - (bMoveLeftHeld ? 1.f : 0.f);
 	if (!FMath::IsNearlyZero(MoveValue))
 	{
@@ -103,14 +146,7 @@ void AOMJPlayerCharacter::UpdateFlipbook()
 
 	if (GetCharacterMovement()->IsFalling())
 	{
-		if (JumpApexFlipbook && FMath::Abs(Velocity.Z) <= JumpApexVelocityThreshold)
-		{
-			NextFlipbook = JumpApexFlipbook;
-		}
-		else
-		{
-			NextFlipbook = Velocity.Z >= 0.f ? JumpFlipbook : FallFlipbook;
-		}
+		NextFlipbook = Velocity.Z >= 0.f ? JumpFlipbook : FallFlipbook;
 	}
 	else if (!FMath::IsNearlyZero(Velocity.X, 5.f))
 	{

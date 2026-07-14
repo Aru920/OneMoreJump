@@ -20,6 +20,9 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION(BlueprintCallable, Category = "Death")
+	void Die();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<USpringArmComponent> CameraBoom;
 
@@ -37,16 +40,16 @@ protected:
 	TObjectPtr<UPaperFlipbook> JumpFlipbook;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
-	TObjectPtr<UPaperFlipbook> JumpApexFlipbook;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 	TObjectPtr<UPaperFlipbook> FallFlipbook;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
-	float JumpApexVelocityThreshold = 80.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	float JumpHeight = 650.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Death")
+	TSubclassOf<AActor> DeathEffectClass;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Death")
+	void OnPlayerDied();
 
 private:
 	void MoveLeftPressed();
@@ -61,4 +64,5 @@ private:
 
 	bool bMoveLeftHeld = false;
 	bool bMoveRightHeld = false;
+	bool bIsDead = false;
 };

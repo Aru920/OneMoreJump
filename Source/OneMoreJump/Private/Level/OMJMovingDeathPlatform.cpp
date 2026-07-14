@@ -1,6 +1,5 @@
 #include "Level/OMJMovingDeathPlatform.h"
 
-#include "Kismet/KismetSystemLibrary.h"
 #include "PaperTileMapComponent.h"
 #include "Player/OMJPlayerCharacter.h"
 
@@ -35,8 +34,8 @@ void AOMJMovingDeathPlatform::HandlePlatformHit(
 
 void AOMJMovingDeathPlatform::KillPlayerIfNeeded(AActor* OtherActor)
 {
-	if (IsValid(OtherActor) && OtherActor->IsA<AOMJPlayerCharacter>())
+	if (AOMJPlayerCharacter* PlayerCharacter = Cast<AOMJPlayerCharacter>(OtherActor))
 	{
-		UKismetSystemLibrary::PrintString(this, TEXT("Dead"), true, true, FLinearColor::Red, 2.f);
+		PlayerCharacter->Die();
 	}
 }
