@@ -103,6 +103,26 @@ void AOMJPlayerCharacter::Win()
 	OnPlayerWon();
 }
 
+void AOMJPlayerCharacter::SetCheckpointLocation(FVector NewCheckpointLocation)
+{
+	CheckpointLocation = NewCheckpointLocation;
+	bHasCheckpoint = true;
+}
+
+void AOMJPlayerCharacter::RespawnAtCheckpoint()
+{
+	if (!bHasCheckpoint)
+	{
+		return;
+	}
+
+	SetActorLocation(CheckpointLocation);
+	SetActorHiddenInGame(false);
+	SetActorEnableCollision(true);
+	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	bIsDead = false;
+}
+
 void AOMJPlayerCharacter::CollectCoin()
 {
 	if (bIsDead || bHasWon)

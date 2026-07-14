@@ -29,6 +29,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Win")
 	void Win();
 
+	UFUNCTION(BlueprintCallable, Category = "Checkpoint")
+	void SetCheckpointLocation(FVector NewCheckpointLocation);
+
+	UFUNCTION(BlueprintCallable, Category = "Checkpoint")
+	void RespawnAtCheckpoint();
+
 	UFUNCTION(BlueprintCallable, Category = "Coins")
 	void CollectCoin();
 
@@ -92,7 +98,9 @@ private:
 	bool bIsDead = false;
 	bool bHasWon = false;
 	bool bRunFinished = false;
+	bool bHasCheckpoint = false;
 	int32 CoinsCollected = 0;
 	float RunStartTime = 0.f;
 	float RunEndTime = 0.f;
+	FVector CheckpointLocation = FVector::ZeroVector;
 };
